@@ -9,7 +9,7 @@ model_name = "Qwen/Qwen2-VL-7B-Instruct"
 model = Qwen2VLForConditionalGeneration.from_pretrained(
     model_name, torch_dtype="auto", device_map="auto",cache_dir=cache_dir
 )
-processor = AutoProcessor.from_pretrained(model_name)
+processor = AutoProcessor.from_pretrained(model_name,cache_dir=cache_dir)
 
 def generate_output(image_content, prompt):
     # Open the image
