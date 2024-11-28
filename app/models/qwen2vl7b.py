@@ -3,12 +3,13 @@ from qwen_vl_utils import process_vision_info
 from PIL import Image
 import torch
 
+cache_dir = "./models"
+model_name = "Qwen/Qwen2-VL-7B-Instruct"
 # Load the model and processor
 model = Qwen2VLForConditionalGeneration.from_pretrained(
-    "Qwen/Qwen2-VL-7B-Instruct", torch_dtype=torch.bfloat16, device_map="auto"
+    model_name, torch_dtype=torch.bfloat16, device_map="auto",cache_dir=cache_dir
 )
-
-processor = AutoProcessor.from_pretrained("Qwen/Qwen2-VL-7B-Instruct")
+processor = AutoProcessor.from_pretrained(model_name)
 
 def generate_output(image_content, prompt):
     # Open the image
