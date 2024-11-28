@@ -7,7 +7,7 @@ cache_dir = "./model_dir"
 model_name = "Qwen/Qwen2-VL-7B-Instruct"
 # Load the model and processor
 model = Qwen2VLForConditionalGeneration.from_pretrained(
-    model_name, torch_dtype=torch.bfloat16, device_map="auto",cache_dir=cache_dir
+    model_name, torch_dtype="auto", device_map="auto",cache_dir=cache_dir
 )
 processor = AutoProcessor.from_pretrained(model_name)
 
