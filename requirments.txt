@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+transformers
+Pillow
+torch
+numpy
+qwen_vl_utils
