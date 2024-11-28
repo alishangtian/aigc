@@ -1,0 +1,1 @@
+ pip install -r requirments.txt -i https://mirrors.cloud.tencent.com/pypi/simple
