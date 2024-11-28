@@ -3,7 +3,7 @@ from qwen_vl_utils import process_vision_info
 from PIL import Image
 import torch
 
-cache_dir = "./models"
+cache_dir = "./model_dir"
 model_name = "Qwen/Qwen2-VL-7B-Instruct"
 # Load the model and processor
 model = Qwen2VLForConditionalGeneration.from_pretrained(
