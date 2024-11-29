@@ -5,7 +5,7 @@ from PIL import Image
 import torch
 
 # 设置日志级别为 DEBUG
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 cache_dir = "./model_dir"
@@ -35,17 +35,17 @@ def generate_output(image_content, prompt):
             ],
         }
     ]
-    logging.debug(f"Prepared messages: {messages}")
+    logging.info(f"Prepared messages: {messages}")
     
     # Prepare for inference
     text = processor.apply_chat_template(
         messages, tokenize=False, add_generation_prompt=True
     )
-    logging.debug(f"Generated text: {text}")
+    logging.info(f"Generated text: {text}")
     
     image_inputs, video_inputs = process_vision_info(messages)
-    logging.debug(f"Processed image inputs: {image_inputs}")
-    logging.debug(f"Processed video inputs: {video_inputs}")
+    logging.info(f"Processed image inputs: {image_inputs}")
+    logging.info(f"Processed video inputs: {video_inputs}")
     
     inputs = processor(
         text=[text],
@@ -54,24 +54,24 @@ def generate_output(image_content, prompt):
         padding=True,
         return_tensors="pt",
     )
-    logging.debug(f"Processed inputs: {inputs}")
+    logging.info(f"Processed inputs: {inputs}")
     
     inputs = inputs.to("cuda")
-    logging.debug("Moved inputs to CUDA")
+    logging.info("Moved inputs to CUDA")
     
     # Inference
     logging.info("Starting inference...")
     generated_ids = model.generate(**inputs, max_new_tokens=128)
-    logging.debug(f"Generated IDs: {generated_ids}")
+    logging.info(f"Generated IDs: {generated_ids}")
     
     generated_ids_trimmed = [
         out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
     ]
-    logging.debug(f"Trimmed generated IDs: {generated_ids_trimmed}")
+    logging.info(f"Trimmed generated IDs: {generated_ids_trimmed}")
     
     output_text = processor.batch_decode(
         generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
     )
-    logging.debug(f"Decoded output text: {output_text}")
+    logging.info(f"Decoded output text: {output_text}")
     
     return output_text[0]
