@@ -8,3 +8,4 @@ qwen_vl_utils
 torchvision
 accelerate
 python-multipart
+flash_attn
