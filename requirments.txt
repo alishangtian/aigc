@@ -7,3 +7,4 @@ numpy
 qwen_vl_utils
 torchvision
 accelerate
+python-multipart
