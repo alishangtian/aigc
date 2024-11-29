@@ -17,9 +17,16 @@ model_name = "Qwen/Qwen2-VL-7B-Instruct"
 # Load the model and processor
 logging.info("Loading model and processor...")
 model = Qwen2VLForConditionalGeneration.from_pretrained(
-    model_name, torch_dtype="auto", device_map="auto", cache_dir=cache_dir
+    model_name,
+    torch_dtype=torch.bfloat16,
+    attn_implementation="flash_attention_2",
+    device_map="auto",
 )
-processor = AutoProcessor.from_pretrained(model_name, cache_dir=cache_dir)
+# The default range for the number of visual tokens per image in the model is 4-16384. You can set min_pixels and max_pixels according to your needs, such as a token count range of 256-1280, to balance speed and memory usage.
+min_pixels = 256*28*28
+max_pixels = 1280*28*28
+# processor = AutoProcessor.from_pretrained("Qwen/Qwen2-VL-7B-Instruct", min_pixels=min_pixels, max_pixels=max_pixels)
+processor = AutoProcessor.from_pretrained(model_name, min_pixels=min_pixels, max_pixels=max_pixels,cache_dir=cache_dir)
 
 def generate_output(image_url, prompt):
     logging.info("Generating output...")
