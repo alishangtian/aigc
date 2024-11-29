@@ -1,3 +1,4 @@
+export TMPDIR=/data2/maoxiaobing/.tmp
 export HF_HOME=/data2/.cache
 export HF_TOKEN=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
 export HF_ENDPOINT=https://hf-mirror.com
