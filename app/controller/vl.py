@@ -1,11 +1,27 @@
 from fastapi import FastAPI, Depends, HTTPException, status, File, UploadFile, Request
 from app.models.qwen2vl7b import generate_output
-import uuid
+import json
 
 app = FastAPI()
 
-# 生成几个随机的API Keys
-allowed_api_keys = {str(uuid.uuid4()) for _ in range(3)}
+# 从配置文件中加载 API Key
+def load_api_keys():
+    try:
+        with open("config.json", "r") as config_file:
+            config = json.load(config_file)
+            return set(config.get("allowed_api_keys", []))
+    except FileNotFoundError:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Configuration file not found"
+        )
+    except json.JSONDecodeError:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Invalid configuration file format"
+        )
+
+allowed_api_keys = load_api_keys()
 print("Allowed API Keys:", allowed_api_keys)
 
 # 依赖函数来检查API Key
@@ -17,6 +33,7 @@ async def verify_api_key(request: Request):
             detail="Invalid Request"
         )
     return x_apikey
+
 @app.post("/recognize")
 async def recognize_image(
     image: UploadFile = File(...),
