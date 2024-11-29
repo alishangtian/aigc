@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, status, File, UploadFile
+from fastapi import FastAPI, Depends, HTTPException, status, File, UploadFile, Request
 from app.models.qwen2vl7b import generate_output
 import uuid
 
@@ -9,13 +9,14 @@ allowed_api_keys = {str(uuid.uuid4()) for _ in range(3)}
 print("Allowed API Keys:", allowed_api_keys)
 
 # 依赖函数来检查API Key
-async def verify_api_key(x_apikey: str = Depends(lambda x: x.get("x-apikey", None))):
+async def verify_api_key(request: Request):
+    x_apikey = request.headers.get("x-apikey")
     if x_apikey not in allowed_api_keys:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or missing API Key"
+            detail="Invalid Request"
         )
-
+    return x_apikey
 @app.post("/recognize")
 async def recognize_image(
     image: UploadFile = File(...),
