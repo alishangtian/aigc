@@ -52,7 +52,8 @@ async def verify_api_key(request: Request):
 
 @app.post("/recognize")
 async def recognize_image(
-    image: UploadFile = File(...),
+    image: UploadFile = File(None),  # 可选参数
+    imageUrl: str = "",  # 新增的 URL 参数
     prompt: str = "",
     api_key: str = Depends(verify_api_key)
 ):
@@ -60,22 +61,32 @@ async def recognize_image(
         logger.info("Processing image recognition request.")
         
         # 打印所有参数
-        logger.info(f"Image filename: {image.filename}")
+        logger.info(f"Image filename: {image.filename if image else 'None'}")
+        logger.info(f"Image URL: {imageUrl}")
         logger.info(f"Prompt: {prompt}")
         logger.info(f"API key: {api_key}")
-        os.makedirs(temp_save_dir, exist_ok=True) 
         
-        # 使用 uuid 生成唯一的文件名
-        file_name = f"{uuid.uuid4()}.{image.filename.split('.')[-1]}"
-        file_path = os.path.join(temp_save_dir, file_name)
+        if imageUrl:
+            # 如果 imageUrl 不为空，直接使用 URL 调用 generate_output
+            output = generate_output(imageUrl, prompt)
+            logger.info("Output generated successfully using image URL.")
+        else:
+            # 如果 imageUrl 为空，保存上传的图片并调用 generate_output
+            os.makedirs(temp_save_dir, exist_ok=True)
+            
+            # 使用 uuid 生成唯一的文件名
+            file_name = f"{uuid.uuid4()}.{image.filename.split('.')[-1]}"
+            file_path = os.path.join(temp_save_dir, file_name)
+            
+            with open(file_path, "wb") as buffer:
+                buffer.write(await image.read())
+            logger.info(f"Image saved to: {file_path}")
+            file_url = f"file://{file_path}"
+            
+            # 使用模型生成输出
+            output = generate_output(file_url, prompt)
+            logger.info("Output generated successfully using local image.")
         
-        with open(file_path, "wb") as buffer:
-            buffer.write(await image.read())
-        logger.info(f"Image saved to: {file_path}")
-        file_url = f"file://{file_path}"
-        # 使用模型生成输出
-        output = generate_output(file_url, prompt)
-        logger.info("Output generated successfully.")
         return {"output": output}
     except Exception as e:
         logger.error(f"Error processing image recognition request: {str(e)}")
