@@ -58,6 +58,11 @@ async def recognize_image(
 ):
     try:
         logger.info("Processing image recognition request.")
+        
+        # 打印所有参数
+        logger.info(f"Image filename: {image.filename}")
+        logger.info(f"Prompt: {prompt}")
+        logger.info(f"API key: {api_key}")
         os.makedirs(temp_save_dir, exist_ok=True) 
         
         # 使用 uuid 生成唯一的文件名
