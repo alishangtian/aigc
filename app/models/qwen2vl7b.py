@@ -4,8 +4,10 @@ from qwen_vl_utils import process_vision_info
 from PIL import Image
 import torch
 import os
+
 os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 os.environ['TORCH_USE_CUDA_DSA'] = '1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '7'
 
 # 设置日志级别为 DEBUG
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
