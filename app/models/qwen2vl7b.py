@@ -22,7 +22,7 @@ def generate_output(image_content, prompt):
     logging.info("Generating output...")
     
     # Open the image
-    logging.debug(f"Opening image: {image_content}")
+    # logging.debug(f"Opening image: {image_content}")
     image = Image.open(image_content)
     
     # Prepare messages
