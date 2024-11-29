@@ -1,7 +1,8 @@
 import logging
 from fastapi import FastAPI, Depends, HTTPException, status, File, UploadFile, Request
 from app.models.qwen2vl7b import generate_output
-import json
+import yaml
+import os
 
 # 配置日志
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -9,29 +10,32 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-# 从配置文件中加载 API Key
-def load_api_keys():
+# 从配置文件中加载配置
+def load_config():
     try:
-        with open("config.json", "r") as config_file:
-            config = json.load(config_file)
-            api_keys = config.get("allowed_api_keys", [])
-            logger.info(f"Loaded {len(api_keys)} API keys from config file.")
-            return set(api_keys)
+        with open("config.yaml", "r") as config_file:
+            config = yaml.safe_load(config_file)
+            logger.info("Configuration loaded successfully.")
+            return config
     except FileNotFoundError:
         logger.error("Configuration file not found.")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Configuration file not found"
         )
-    except json.JSONDecodeError:
+    except yaml.YAMLError:
         logger.error("Invalid configuration file format.")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Invalid configuration file format"
         )
 
-allowed_api_keys = load_api_keys()
+config = load_config()
+allowed_api_keys = set(config.get("allowed_api_keys", []))
+temp_save_dir = config.get("temp_save_dir", "/data2/maoxiaobing/.tmp")
+
 logger.info("Allowed API Keys: %s", allowed_api_keys)
+logger.info("Temporary save directory: %s", temp_save_dir)
 
 # 依赖函数来检查API Key
 async def verify_api_key(request: Request):
@@ -53,11 +57,14 @@ async def recognize_image(
 ):
     try:
         logger.info("Processing image recognition request.")
-        # 读取图片内容
-        image_content = await image.read()
-        logger.info("Image content read successfully.")
+        os.makedirs(temp_save_dir, exist_ok=True) 
+        file_path = os.path.join(temp_save_dir, image.filename)
+        with open(file_path, "wb") as buffer:
+            buffer.write(await image.read())
+        logger.info(f"Image saved to: {file_path}")
+        file_url = f"file://{file_path}"
         # 使用模型生成输出
-        output = generate_output(image_content, prompt)
+        output = generate_output(file_url, prompt)
         logger.info("Output generated successfully.")
         return {"output": output}
     except Exception as e:

@@ -18,19 +18,18 @@ model = Qwen2VLForConditionalGeneration.from_pretrained(
 )
 processor = AutoProcessor.from_pretrained(model_name, cache_dir=cache_dir)
 
-def generate_output(image_content, prompt):
+def generate_output(image_url, prompt):
     logging.info("Generating output...")
     
     # Open the image
-    # logging.debug(f"Opening image: {image_content}")
-    image = Image.open(image_content)
+    logging.info(f"image_url: {image_url}")
     
     # Prepare messages
     messages = [
         {
             "role": "user",
             "content": [
-                {"type": "image", "image": image},
+                {"type": "image", "image": image_url},
                 {"type": "text", "text": prompt},
             ],
         }

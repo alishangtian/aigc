@@ -1,0 +1,7 @@
+# API Keys allowed to access the service
+allowed_api_keys:
+  - "5500eca2-5974-43f9-8619-2ed477a0eff8"
+  - "dfc9c633-aa6e-4b0e-b514-cbf278b944b1"
+  - "9a86d2d6-4584-4cf7-81f3-2f46b4671097"
+# Temporary directory to save uploaded images
+temp_save_dir: "/data2/maoxiaobing/.tmp"
