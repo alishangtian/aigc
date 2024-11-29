@@ -1,7 +1,7 @@
 import os
 import logging
 import uuid
-from fastapi import FastAPI, Depends, HTTPException, status, File, UploadFile, Request
+from fastapi import FastAPI, Depends, HTTPException, status, File, UploadFile, Request, Form
 from app.models.qwen2vl7b import generate_output
 import yaml
 
@@ -53,8 +53,8 @@ async def verify_api_key(request: Request):
 @app.post("/recognize")
 async def recognize_image(
     image: UploadFile = File(None),  # 可选参数
-    imageUrl: str = "",  # 新增的 URL 参数
-    prompt: str = "",
+    imageUrl: str = Form(""),  # 新增的 URL 参数
+    prompt: str = Form(""),
     api_key: str = Depends(verify_api_key)
 ):
     try:
