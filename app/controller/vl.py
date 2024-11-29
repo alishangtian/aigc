@@ -1,8 +1,9 @@
+import os
 import logging
+import uuid
 from fastapi import FastAPI, Depends, HTTPException, status, File, UploadFile, Request
 from app.models.qwen2vl7b import generate_output
 import yaml
-import os
 
 # 配置日志
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -58,7 +59,11 @@ async def recognize_image(
     try:
         logger.info("Processing image recognition request.")
         os.makedirs(temp_save_dir, exist_ok=True) 
-        file_path = os.path.join(temp_save_dir, image.filename)
+        
+        # 使用 uuid 生成唯一的文件名
+        file_name = f"{uuid.uuid4()}.{image.filename.split('.')[-1]}"
+        file_path = os.path.join(temp_save_dir, file_name)
+        
         with open(file_path, "wb") as buffer:
             buffer.write(await image.read())
         logger.info(f"Image saved to: {file_path}")
