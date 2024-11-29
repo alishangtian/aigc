@@ -63,7 +63,13 @@ def generate_output(image_url, prompt):
     
     # Inference
     logging.info("Starting inference...")
-    generated_ids = model.generate(**inputs, max_new_tokens=128)
+    # Use mixed precision for inference
+    with torch.cuda.amp.autocast():
+        # Inference
+        logging.info("Starting inference...")
+        generated_ids = model.generate(**inputs, max_new_tokens=64)  # Reduce max_new_tokens
+        logging.info(f"Generated IDs: {generated_ids}")
+    # generated_ids = model.generate(**inputs, max_new_tokens=128)
     logging.info(f"Generated IDs: {generated_ids}")
     
     generated_ids_trimmed = [
